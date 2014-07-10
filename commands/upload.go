@@ -23,6 +23,8 @@ func Upload(Args []string) {
 
 	config, err := config.Load()
 
+	concurrency := 60
+
 	if err != nil {
 		fmt.Printf("could not %s\n", err)
 		return
@@ -43,6 +45,8 @@ func Upload(Args []string) {
 
 	var wg sync.WaitGroup
 
+	sem := make(chan bool, concurrency)
+
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 
 		if strings.HasPrefix(info.Name(), ".") && len(info.Name()) > 1 {
@@ -59,7 +63,11 @@ func Upload(Args []string) {
 
 			wg.Add(1)
 
+			sem <- true
+
 			go func(path string) {
+
+				defer func() { <-sem }()
 
 				base := strings.TrimPrefix(path, filepath.Dir(root))
 
@@ -68,7 +76,7 @@ func Upload(Args []string) {
 				}
 
 				defer wg.Done()
-				defer fmt.Printf(" %s\n", base)
+				defer fmt.Printf("+ %s\n", base)
 
 				url := fmt.Sprintf("%s/files/%s", config.URL, base)
 
@@ -97,6 +105,10 @@ func Upload(Args []string) {
 	}
 
 	filepath.Walk(root, walkFunc)
+
+	for i := 0; i < cap(sem); i++ {
+		sem <- true
+	}
 
 	wg.Wait()
 }
