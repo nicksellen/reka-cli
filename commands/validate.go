@@ -14,7 +14,7 @@ import (
 func Validate(Args []string) {
 
 	if len(Args) != 1 {
-		println("please provide path to validate from")
+		println("please provide path to validate")
 		os.Exit(1)
 	}
 
@@ -37,8 +37,6 @@ func Validate(Args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	//var data map[string]interface{}
 
 	type ValidationError struct {
 		Message     string `json:"message"`

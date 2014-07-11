@@ -11,7 +11,7 @@ import (
 func Undeploy(Args []string) {
 
 	if len(Args) != 1 {
-		println("please provide path to deploy from")
+		println("please provide the id to undeploy")
 		os.Exit(1)
 	}
 
@@ -19,9 +19,9 @@ func Undeploy(Args []string) {
 
 	client := &http.Client{}
 
-	uuid := Args[0]
+	identity := Args[0]
 
-	url := fmt.Sprintf("%s/apps/%s", config.URL, uuid)
+	url := fmt.Sprintf("%s/apps/%s", config.URL, identity)
 
 	req, err := http.NewRequest("DELETE", url, nil)
 
@@ -31,6 +31,6 @@ func Undeploy(Args []string) {
 
 	_, err = client.Do(req)
 
-	fmt.Printf("undeployed %s!\n", uuid)
+	fmt.Printf("undeployed %s!\n", identity)
 
 }

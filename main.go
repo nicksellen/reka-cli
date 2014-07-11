@@ -13,6 +13,7 @@ func main() {
 	app.Name = "reka"
 	app.Usage = "cli for using reka :)"
 	app.Version = "0.0.1"
+
 	app.Commands = []cli.Command{
 		{
 			Name:  "send",

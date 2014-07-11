@@ -11,7 +11,7 @@ import (
 func Redeploy(Args []string) {
 
 	if len(Args) != 1 {
-		println("please provide path to deploy from")
+		println("please provide the id to redeploy")
 		os.Exit(1)
 	}
 
@@ -19,9 +19,9 @@ func Redeploy(Args []string) {
 
 	client := &http.Client{}
 
-	uuid := Args[0]
+	identity := Args[0]
 
-	url := fmt.Sprintf("%s/apps/%s/redeploy", config.URL, uuid)
+	url := fmt.Sprintf("%s/apps/%s/redeploy", config.URL, identity)
 
 	req, err := http.NewRequest("PUT", url, nil)
 
@@ -31,6 +31,6 @@ func Redeploy(Args []string) {
 
 	_, err = client.Do(req)
 
-	fmt.Printf("redeployed %s!\n", uuid)
+	fmt.Printf("redeployed %s!\n", identity)
 
 }

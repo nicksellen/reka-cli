@@ -14,7 +14,7 @@ import (
 func Deploy(Args []string) {
 
 	if len(Args) != 1 {
-		println("please provide path to deploy from")
+		println("please provide path to deploy")
 		os.Exit(1)
 	}
 
@@ -42,6 +42,6 @@ func Deploy(Args []string) {
 
 	err = json.Unmarshal(body.Bytes(), &data)
 
-	fmt.Println(data)
+	fmt.Println(data["message"])
 
 }
