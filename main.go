@@ -4,6 +4,7 @@ import (
 	"github.com/codegangsta/cli"
 	"os"
 	"reka/commands"
+  _ "crypto/sha512"
 )
 
 func main() {
