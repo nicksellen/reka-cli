@@ -42,6 +42,10 @@ func Deploy(Args []string) {
 
 	err = json.Unmarshal(body.Bytes(), &data)
 
+	fmt.Println(resp)
+
+	fmt.Println(data)
+
 	fmt.Println(data["message"])
 
 }
