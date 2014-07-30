@@ -15,7 +15,7 @@ func Load() (CLIConfig, error) {
 	var url = os.Getenv("REKA_HOST")
 
 	if url == "" {
-		println("missing config environment variable: REKAHOST")
+		println("missing config environment variable: REKA_HOST")
 		os.Exit(1)
 	}
 
