@@ -1,41 +1,80 @@
 package config
 
 import (
-	//"encoding/json"
-	//"io/ioutil"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
-type CLIConfig struct {
-	URL string `json:"url"`
+type RekaConfig struct {
+	WorkDir       string            `json:"work"`
+	Identity      string            `json:"identity"`
+	DefaultServer string            `json:"default-server"`
+	Servers       map[string]Server `json:"servers"`
 }
 
-func Load() (CLIConfig, error) {
+type Server struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
 
-	var url = os.Getenv("REKA_HOST")
-
-	if url == "" {
-		println("missing config environment variable: REKA_HOST")
-		os.Exit(1)
-	}
-
-	var config = new(CLIConfig)
-	config.URL = url
-	return *config, nil
-
-	/*
-		var filename = ".reka.json"
-		var config CLIConfig
-		if _, err := os.Stat(filename); err == nil {
-			var data, err = ioutil.ReadFile(filename)
-			if err != nil {
-				return config, err
-			}
-			json.Unmarshal(data, &config)
-		} else {
-			println("missing config file", filename)
-			os.Exit(1)
+func (config RekaConfig) GetServer(name string) (Server, error) {
+	server, ok := config.Servers[name]
+	if !ok {
+		var keys []string
+		for k := range config.Servers {
+			keys = append(keys, k)
 		}
-		return config, nil
-	*/
+		return *new(Server), fmt.Errorf("no server called %s (valid servers: %s)\n", name, keys)
+	}
+	return server, nil
+}
+
+func Load() (RekaConfig, error) {
+	return Walk()
+}
+
+func TrimmedContents(path string) string {
+	bytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return strings.TrimSpace(string(bytes))
+}
+
+func Walk() (RekaConfig, error) {
+	root := ".reka/config/"
+	var config RekaConfig
+
+	config.WorkDir = "."
+
+	config.Servers = make(map[string]Server)
+
+	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			key := strings.TrimPrefix(path, root)
+
+			if strings.HasPrefix(key, "servers/") {
+				name := strings.TrimPrefix(key, "servers/")
+				config.Servers[name] = Server{
+					Name: name,
+					URL:  TrimmedContents(path),
+				}
+			} else if key == "work" {
+				config.WorkDir = TrimmedContents(path)
+			} else if key == "identity" {
+				config.Identity = TrimmedContents(path)
+			} else if key == "default-server" {
+				config.DefaultServer = TrimmedContents(path)
+			} else {
+				fmt.Printf("walked unused '%s'\n", key)
+			}
+
+		}
+		return nil
+	})
+	return config, nil
 }

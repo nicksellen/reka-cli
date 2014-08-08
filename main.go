@@ -4,7 +4,6 @@ import (
 	"github.com/codegangsta/cli"
 	"os"
 	"reka/commands"
-  _ "crypto/sha512"
 )
 
 func main() {
@@ -17,38 +16,24 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:  "send",
-			Usage: "Upload files to reka, ready for deployment",
+			Name:  "push",
+			Usage: "Push to reka instance to run",
 			Action: func(c *cli.Context) {
-				commands.Upload(c.Args())
+				commands.Push(c.Args())
 			},
 		},
 		{
-			Name:  "validate",
-			Usage: "Validate some previously upload config",
+			Name:  "init",
+			Usage: "Initialize reka config in current dir",
 			Action: func(c *cli.Context) {
-				commands.Validate(c.Args())
+				commands.Init(c.Args())
 			},
 		},
 		{
-			Name:  "deploy",
-			Usage: "Deploy some previously upload config",
+			Name:  "server-add",
+			Usage: "Add a server",
 			Action: func(c *cli.Context) {
-				commands.Deploy(c.Args())
-			},
-		},
-		{
-			Name:  "redeploy",
-			Usage: "Redeploy an application by uuid",
-			Action: func(c *cli.Context) {
-				commands.Redeploy(c.Args())
-			},
-		},
-		{
-			Name:  "undeploy",
-			Usage: "Undeploy an application by uuid",
-			Action: func(c *cli.Context) {
-				commands.Undeploy(c.Args())
+				commands.ServerAdd(c.Args())
 			},
 		},
 	}
