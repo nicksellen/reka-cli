@@ -8,7 +8,7 @@ import (
 
 func ServerAdd(Args []string) {
 	if len(Args) != 2 {
-		log.Fatal("please provide server name and address")
+		log.Fatal("please provide server name and remote address")
 	}
 	name := Args[0]
 	url := Args[1]

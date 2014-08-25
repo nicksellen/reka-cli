@@ -23,17 +23,30 @@ func main() {
 			},
 		},
 		{
-			Name:  "init",
-			Usage: "Initialize reka config in current dir",
+			Name:  "new",
+			Usage: "Create new reka skeleton app",
 			Action: func(c *cli.Context) {
 				commands.Init(c.Args())
 			},
 		},
 		{
-			Name:  "server-add",
-			Usage: "Add a server",
-			Action: func(c *cli.Context) {
-				commands.ServerAdd(c.Args())
+			Name:  "server",
+			Usage: "Add and remove servers",
+			Subcommands: []cli.Command{
+				{
+					Name:  "add",
+					Usage: "Register a new remote server",
+					Action: func(c *cli.Context) {
+						commands.ServerAdd(c.Args())
+					},
+				},
+				{
+					Name:  "ls",
+					Usage: "List servers",
+					Action: func(c *cli.Context) {
+						commands.ServerList(c.Args())
+					},
+				},
 			},
 		},
 	}

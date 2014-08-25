@@ -11,7 +11,6 @@ import (
 
 type RekaConfig struct {
 	WorkDir       string            `json:"work"`
-	Identity      string            `json:"identity"`
 	DefaultServer string            `json:"default-server"`
 	Servers       map[string]Server `json:"servers"`
 }
@@ -63,10 +62,6 @@ func Walk() (RekaConfig, error) {
 					Name: name,
 					URL:  TrimmedContents(path),
 				}
-			} else if key == "work" {
-				config.WorkDir = TrimmedContents(path)
-			} else if key == "identity" {
-				config.Identity = TrimmedContents(path)
 			} else if key == "default-server" {
 				config.DefaultServer = TrimmedContents(path)
 			} else {

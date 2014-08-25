@@ -2,13 +2,15 @@ package commands
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/wsxiaoys/terminal/color"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"reka/config"
 	"reka/util"
+	"sync"
+	"time"
 )
 
 func Push(Args []string) {
@@ -34,16 +36,23 @@ func Push(Args []string) {
 		log.Fatal(err)
 	}
 
+	spinner1 := ShowSpinner()
+	color.Printf("packing ")
+
 	buf, err := util.Zip(config.WorkDir)
+	spinner1.Done()
+	color.Printf("@{g}✓\n")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	url := fmt.Sprintf("%s/apps/%s", server.URL, config.Identity)
+	spinner2 := ShowSpinner()
 
-	color.Printf("pushing @{!}%s@{|} to %s... ", config.Identity, server.Name)
+	color.Printf("pushing to @{!}%s@{|} ", server.Name)
 
-	resp, err := http.Post(url, "application/zip", buf)
+	resp, err := http.Post(server.URL, "application/zip", buf)
+	spinner2.Done()
+
 	if err != nil {
 		color.Printf("@{r}✕ failed\n")
 		log.Fatal(err)
@@ -76,4 +85,41 @@ func ReadBody(resp *http.Response) []byte {
 		log.Fatal(err)
 	}
 	return body
+}
+
+type Spinner struct {
+	IsDone bool
+	wg     sync.WaitGroup
+}
+
+func (spinner Spinner) Done() {
+	spinner.IsDone = true
+	spinner.wg.Wait()
+}
+
+func ShowSpinner() Spinner {
+
+	var wg sync.WaitGroup
+	var spinner Spinner
+	spinner.wg = wg
+	spinner.IsDone = false
+
+	wg.Add(1)
+
+	go func() {
+		chars := [4]string{"\\", "|", "/", "-"}
+		next := 0
+		defer wg.Done()
+		for !spinner.IsDone {
+			os.Stdout.Write([]byte(chars[next]))
+			os.Stdout.Write([]byte("\b"))
+			time.Sleep(100 * time.Millisecond)
+			next = next + 1
+			if next > len(chars)-1 {
+				next = 0
+			}
+		}
+	}()
+
+	return spinner
 }

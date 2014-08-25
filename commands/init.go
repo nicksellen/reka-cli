@@ -3,20 +3,30 @@ package commands
 import (
 	"log"
 	"os"
-	"reka/config/confutil"
 )
 
 func Init(Args []string) {
 
 	if len(Args) != 1 {
-		log.Fatal("please provide the application identity")
+		log.Fatal("please provide the application name")
 	}
 
 	identity := Args[0]
 
-	os.MkdirAll(".reka/config/servers", 0755)
+	info, err := os.Stat(identity)
+	if err != nil && !os.IsNotExist(err) {
+		log.Fatal(err)
+	}
 
-	confutil.WriteIfMissing(".reka/config/identity", identity)
-	confutil.WriteIfMissing(".reka/config/work", ".")
+	if info != nil && info.IsDir() {
+		log.Fatal(identity + " already exists")
+	}
+
+	os.MkdirAll(identity+"/.reka/config/servers", 0755)
+	file, err := os.Create(identity + "/main.reka")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
 
 }
