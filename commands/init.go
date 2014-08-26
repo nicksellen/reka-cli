@@ -8,25 +8,36 @@ import (
 func Init(Args []string) {
 
 	if len(Args) != 1 {
-		log.Fatal("please provide the application name")
+		log.Fatal("please provide the directory to initialize")
 	}
 
-	identity := Args[0]
+	dir := Args[0]
 
-	info, err := os.Stat(identity)
+	info, err := os.Stat(dir)
+
 	if err != nil && !os.IsNotExist(err) {
 		log.Fatal(err)
 	}
 
-	if info != nil && info.IsDir() {
-		log.Fatal(identity + " already exists")
+	if dir != "." && info != nil && info.IsDir() {
+		log.Fatal(dir + " already exists")
 	}
 
-	os.MkdirAll(identity+"/.reka/config/servers", 0755)
-	file, err := os.Create(identity + "/main.reka")
+	os.MkdirAll(dir+"/.reka/config/servers", 0755)
+
+	main := dir + "/main.reka"
+
+	_, err = os.Stat(main)
 	if err != nil {
-		log.Fatal(err)
+		if os.IsNotExist(err) {
+			file, err := os.Create(main)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer file.Close()
+		} else {
+			log.Fatal(err)
+		}
 	}
-	defer file.Close()
 
 }

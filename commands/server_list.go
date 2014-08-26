@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"fmt"
+	"github.com/wsxiaoys/terminal/color"
 	"log"
 	"reka/config"
 	"strconv"
@@ -19,6 +19,10 @@ func ServerList(Args []string) {
 		}
 	}
 	for name, server := range config.Servers {
-		fmt.Printf((" %" + strconv.Itoa(length) + "s %s\n"), name, server.URL)
+		if name == config.DefaultServer {
+			color.Printf((" * @{!}%" + strconv.Itoa(length) + "s@{|} %s\n"), name, server.URL)
+		} else {
+			color.Printf(("   @{!}%" + strconv.Itoa(length) + "s@{|} %s\n"), name, server.URL)
+		}
 	}
 }

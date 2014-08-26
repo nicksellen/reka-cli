@@ -36,7 +36,7 @@ func Push(Args []string) {
 		log.Fatal(err)
 	}
 
-	spinner1 := ShowSpinner()
+	spinner1 := NewSpinner()
 	color.Printf("packing ")
 
 	buf, err := util.Zip(config.WorkDir)
@@ -46,7 +46,7 @@ func Push(Args []string) {
 		log.Fatal(err)
 	}
 
-	spinner2 := ShowSpinner()
+	spinner2 := NewSpinner()
 
 	color.Printf("pushing to @{!}%s@{|} ", server.Name)
 
@@ -97,12 +97,14 @@ func (spinner Spinner) Done() {
 	spinner.wg.Wait()
 }
 
-func ShowSpinner() Spinner {
+func NewSpinner() Spinner {
 
 	var wg sync.WaitGroup
-	var spinner Spinner
-	spinner.wg = wg
-	spinner.IsDone = false
+
+	spinner := Spinner{
+		wg:     wg,
+		IsDone: false,
+	}
 
 	wg.Add(1)
 

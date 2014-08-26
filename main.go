@@ -17,7 +17,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:  "push",
-			Usage: "Push to reka instance to run",
+			Usage: "Push app to a server",
 			Action: func(c *cli.Context) {
 				commands.Push(c.Args())
 			},
@@ -41,7 +41,7 @@ func main() {
 					},
 				},
 				{
-					Name:  "ls",
+					Name:  "list",
 					Usage: "List servers",
 					Action: func(c *cli.Context) {
 						commands.ServerList(c.Args())
