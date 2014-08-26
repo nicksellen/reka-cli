@@ -65,7 +65,7 @@ func Walk() (RekaConfig, error) {
 			} else if key == "default-server" {
 				config.DefaultServer = TrimmedContents(path)
 			} else {
-				fmt.Printf("walked unused '%s'\n", key)
+				fmt.Printf("deprecated config at %s\n", path)
 			}
 
 		}
