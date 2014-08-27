@@ -16,10 +16,10 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:  "push",
-			Usage: "Push app to a server",
+			Name:  "deploy",
+			Usage: "Deploy app to a server",
 			Action: func(c *cli.Context) {
-				commands.Push(c.Args())
+				commands.Deploy(c.Args())
 			},
 		},
 		{

@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func Push(Args []string) {
+func Deploy(Args []string) {
 
 	config, err := config.Load()
 	if err != nil {
