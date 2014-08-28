@@ -1,6 +1,8 @@
 oses = darwin linux windows solaris
 arches = amd64
 
+.PHONY: upload-s3 clean
+
 clean:
 	@rm -rf build
 
@@ -13,7 +15,7 @@ build:
 		done \
 	done
 
-s3: build
+upload-s3: build
 	@for os in $(oses); do \
 		for arch in $(arches); do \
 			echo "uploading $$os-$$arch"; \

@@ -37,7 +37,7 @@ func Deploy(Args []string) {
 	}
 
 	spinner1 := NewSpinner()
-	color.Printf("packing ")
+	color.Printf("packaging ")
 
 	buf, err := util.Zip(config.WorkDir)
 	spinner1.Done()
@@ -48,7 +48,7 @@ func Deploy(Args []string) {
 
 	spinner2 := NewSpinner()
 
-	color.Printf("pushing to @{!}%s@{|} ", server.Name)
+	color.Printf("deploying to @{!}%s@{|} ", server.Name)
 
 	resp, err := http.Post(server.URL, "application/zip", buf)
 	spinner2.Done()
@@ -62,7 +62,7 @@ func Deploy(Args []string) {
 	if ct == "application/json" {
 		var data map[string]interface{}
 		json.Unmarshal(ReadBody(resp), &data)
-		color.Printf("@{r}✕ server error@{|}\n%s\n", data["message"])
+		color.Printf("@{r}✕ error@{|}\n%s\n", data["message"])
 	} else {
 		switch {
 		case code >= 200 && code < 300:
@@ -70,7 +70,7 @@ func Deploy(Args []string) {
 		case code >= 400 && code < 500:
 			color.Printf("@{r}✕ client error@{|}\n%s\n", string(ReadBody(resp)))
 		case code >= 500 && code < 600:
-			color.Printf("@{r}✕ server error@{|}\n%s\n", string(ReadBody(resp)))
+			color.Printf("@{r}✕ error@{|}\n%s\n", string(ReadBody(resp)))
 		default:
 			color.Printf("@{r}✕ %d error@{|}\n", code)
 		}
