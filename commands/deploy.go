@@ -89,7 +89,7 @@ func Deploy(Args []string) {
 		color.Fprintf(&buffer, "    @{.}deployment@{|} @{!}%s@{|}\n", deployment.Url)
 
 		if len(ok.Networks) > 0 {
-			color.Fprintf(&buffer, "  @{.}listening on@{|} ")
+			color.Fprintf(&buffer, "\n  @{.}listening on@{|} ")
 			for _, network := range ok.Networks {
 				if network.Url != "" {
 					color.Fprintf(&buffer, "@{!}%s@{|}\n", network.Url)
