@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -16,7 +17,7 @@ func EmptyBuffer() *bytes.Buffer {
 	return new(bytes.Buffer)
 }
 
-func Zip(root string) (*bytes.Buffer, error) {
+func Zip(root string, ignore []string) (*bytes.Buffer, error) {
 
 	finfo, err := os.Stat(root)
 	if err != nil {
@@ -30,22 +31,30 @@ func Zip(root string) (*bytes.Buffer, error) {
 	buf := new(bytes.Buffer)
 	w := zip.NewWriter(buf)
 
-	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	filepath.Walk(root, func(p string, info os.FileInfo, err error) error {
 
-		relPath := strings.TrimPrefix(strings.TrimPrefix(path, filepath.Dir(root)), "/")
+		relPath := strings.TrimPrefix(strings.TrimPrefix(p, filepath.Dir(root)), "/")
+
+		if info == nil {
+			return nil
+		}
 
 		if strings.HasPrefix(info.Name(), ".") && len(info.Name()) > 1 {
 			if info.IsDir() {
-				//fmt.Printf("skipping %s\n", relPath)
 				return filepath.SkipDir
 			} else {
-				//fmt.Printf("skipping %s\n", relPath)
+				return nil
+			}
+		}
+
+		for _, ignorePattern := range ignore {
+			matched, _ := path.Match(ignorePattern, relPath)
+			if matched {
 				return nil
 			}
 		}
 
 		if !info.IsDir() {
-			//defer fmt.Printf("+ %s\n", relPath)
 
 			header := &zip.FileHeader{
 				Name:   relPath,
@@ -60,7 +69,7 @@ func Zip(root string) (*bytes.Buffer, error) {
 				log.Fatal(err)
 			}
 
-			file, err := os.Open(path)
+			file, err := os.Open(p)
 			defer file.Close()
 			if err != nil {
 				log.Fatal(err)

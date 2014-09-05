@@ -1,7 +1,9 @@
 package commands
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/wsxiaoys/terminal/color"
 	"io/ioutil"
 	"log"
@@ -13,6 +15,18 @@ import (
 	"time"
 )
 
+type DeployOk struct {
+	Name     string    `json:"name"`
+	Networks []Network `json:"network"`
+}
+
+type Network struct {
+	Port     int    `json:"port"`
+	Protocol string `json:"protocol"`
+	Host     string `json:"host"`
+	Url      string `json:"url"`
+}
+
 func Deploy(Args []string) {
 
 	config, err := config.Load()
@@ -23,15 +37,15 @@ func Deploy(Args []string) {
 	name := ""
 
 	if len(Args) == 0 {
-		name = config.DefaultServer
+		name = config.DefaultDeployment
 		if name == "" {
-			log.Fatal("please provide reka server name, or setup a default server: echo name > .reka/config/default-server")
+			log.Fatal("please provide reka deployment name, or setup a default: echo name > .reka/config/default-deployment")
 		}
 	} else {
 		name = Args[0]
 	}
 
-	server, err := config.GetServer(name)
+	deployment, err := config.GetDeployment(name)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,7 +53,7 @@ func Deploy(Args []string) {
 	spinner1 := NewSpinner()
 	color.Printf("packaging ")
 
-	buf, err := util.Zip(config.WorkDir)
+	buf, err := util.Zip(config.WorkDir, config.Ignore)
 	spinner1.Done()
 	color.Printf("@{g}✓\n")
 	if err != nil {
@@ -48,32 +62,54 @@ func Deploy(Args []string) {
 
 	spinner2 := NewSpinner()
 
-	color.Printf("deploying to @{!}%s@{|} ", server.Name)
+	color.Printf("deploying to @{!}%s@{|} ", deployment.Name)
 
-	resp, err := http.Post(server.URL, "application/zip", buf)
+	resp, err := http.Post(deployment.Url, "application/zip", buf)
 	spinner2.Done()
 
 	if err != nil {
-		color.Printf("@{r}✕ failed\n")
-		log.Fatal(err)
+		color.Printf("@{r}✕ failed\n  @{.}%s@{|}\n", err)
+		os.Exit(1)
 	}
+
 	code := resp.StatusCode
-	ct := resp.Header.Get("Content-Type")
-	if ct == "application/json" {
-		var data map[string]interface{}
-		json.Unmarshal(ReadBody(resp), &data)
-		color.Printf("@{r}✕ error@{|}\n%s\n", data["message"])
-	} else {
-		switch {
-		case code >= 200 && code < 300:
-			color.Printf("@{g}✓ %s\n", ReadBody(resp))
-		case code >= 400 && code < 500:
-			color.Printf("@{r}✕ client error@{|}\n%s\n", string(ReadBody(resp)))
-		case code >= 500 && code < 600:
-			color.Printf("@{r}✕ error@{|}\n%s\n", string(ReadBody(resp)))
-		default:
-			color.Printf("@{r}✕ %d error@{|}\n", code)
+
+	var data map[string]interface{}
+
+	switch {
+	case code >= 200 && code < 300:
+		var ok DeployOk
+		json.Unmarshal(ReadBody(resp), &ok)
+
+		var buffer bytes.Buffer
+		color.Fprintf(&buffer, "@{g}✓ success@{|}")
+		color.Fprintf(&buffer, "\n\n")
+
+		color.Fprintf(&buffer, "          @{.}name@{|} @{!}%s@{|}\n", ok.Name)
+		color.Fprintf(&buffer, "    @{.}deployment@{|} @{!}%s@{|}\n", deployment.Url)
+
+		if len(ok.Networks) > 0 {
+			color.Fprintf(&buffer, "  @{.}listening on@{|} ")
+			for _, network := range ok.Networks {
+				if network.Url != "" {
+					color.Fprintf(&buffer, "@{!}%s@{|}\n", network.Url)
+				} else {
+					color.Fprintf(&buffer, "%s on port %s\n", network.Protocol, network.Port)
+				}
+				color.Fprintf(&buffer, "               ")
+			}
 		}
+		color.Fprintf(&buffer, "\n")
+
+		fmt.Print(buffer.String())
+	case code >= 400 && code < 500:
+		json.Unmarshal(ReadBody(resp), &data)
+		color.Printf("@{r}✕ client error@{|}\n@{.}%s@{|}\n", data["message"])
+	case code >= 500 && code < 600:
+		json.Unmarshal(ReadBody(resp), &data)
+		color.Printf("@{r}✕ error@{|}\n@{.}%s@{|}\n", data["message"])
+	default:
+		color.Printf("@{r}✕ %d error@{|}\n", code)
 	}
 
 }

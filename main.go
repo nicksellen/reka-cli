@@ -30,21 +30,21 @@ func main() {
 			},
 		},
 		{
-			Name:  "server",
-			Usage: "Add and remove servers",
+			Name:  "deployment",
+			Usage: "add/remove/list deployments",
 			Subcommands: []cli.Command{
 				{
 					Name:  "add",
-					Usage: "Register a new remote server",
+					Usage: "register a deployment",
 					Action: func(c *cli.Context) {
-						commands.ServerAdd(c.Args())
+						commands.DeploymentAdd(c.Args())
 					},
 				},
 				{
 					Name:  "list",
-					Usage: "List servers",
+					Usage: "list deployments",
 					Action: func(c *cli.Context) {
-						commands.ServerList(c.Args())
+						commands.DeploymentList(c.Args())
 					},
 				},
 			},
