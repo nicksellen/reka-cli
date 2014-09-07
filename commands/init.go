@@ -23,7 +23,7 @@ func Init(Args []string) {
 		log.Fatal(dir + " already exists")
 	}
 
-	os.MkdirAll(dir+"/.reka/config/servers", 0755)
+	os.MkdirAll(dir+"/.reka/config/deployments", 0755)
 
 	main := dir + "/main.reka"
 
