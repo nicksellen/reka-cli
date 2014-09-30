@@ -64,7 +64,18 @@ func Deploy(Args []string) {
 
 	color.Printf("deploying to @{!}%s@{|} ", deployment.Name)
 
-	resp, err := http.Post(deployment.Url, "application/zip", buf)
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", deployment.Url, buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Set("Content-Type", "application/zip")
+	req.Header.Set("Accept", "application/json")
+	resp, err := client.Do(req)
+
+	/*
+		resp, err := http.Post(deployment.Url, "application/zip", buf)
+	*/
 	spinner2.Done()
 
 	if err != nil {
@@ -94,7 +105,7 @@ func Deploy(Args []string) {
 				if network.Url != "" {
 					color.Fprintf(&buffer, "@{!}%s@{|}\n", network.Url)
 				} else {
-					color.Fprintf(&buffer, "%s on port %s\n", network.Protocol, network.Port)
+					color.Fprintf(&buffer, "%s on port %d\n", network.Protocol, network.Port)
 				}
 				color.Fprintf(&buffer, "               ")
 			}
