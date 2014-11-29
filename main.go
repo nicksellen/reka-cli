@@ -23,6 +23,13 @@ func main() {
 			},
 		},
 		{
+			Name:  "undeploy",
+			Usage: "Undeploy app from a server",
+			Action: func(c *cli.Context) {
+				commands.Undeploy(c.Args())
+			},
+		},
+		{
 			Name:  "new",
 			Usage: "Create new reka skeleton app",
 			Action: func(c *cli.Context) {
