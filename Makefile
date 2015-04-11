@@ -1,7 +1,7 @@
 oses = darwin linux windows solaris
 arches = amd64
 
-.PHONY: upload-s3 clean
+.PHONY: upload-s3 clean build
 
 clean:
 	@rm -rf build
