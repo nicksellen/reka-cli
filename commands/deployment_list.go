@@ -1,9 +1,9 @@
 package commands
 
 import (
+	"github.com/nicksellen/reka/config"
 	"github.com/wsxiaoys/terminal/color"
 	"log"
-	"reka/config"
 	"strconv"
 )
 

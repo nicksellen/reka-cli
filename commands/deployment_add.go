@@ -1,9 +1,9 @@
 package commands
 
 import (
+	"github.com/nicksellen/reka/config/confutil"
 	"log"
 	"path"
-	"reka/config/confutil"
 )
 
 func DeploymentAdd(Args []string) {

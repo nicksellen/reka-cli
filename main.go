@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
+	"github.com/nicksellen/reka/commands"
 	"os"
-	"reka/commands"
 )
 
 func main() {
