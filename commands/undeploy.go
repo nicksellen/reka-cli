@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/nicksellen/reka/config"
+	"github.com/nicksellen/reka-cli/config"
 	"github.com/wsxiaoys/terminal/color"
 	"log"
 	"net/http"

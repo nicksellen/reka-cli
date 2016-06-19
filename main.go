@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
-	"github.com/nicksellen/reka/commands"
+	"github.com/nicksellen/reka-cli/commands"
 	"os"
 )
 

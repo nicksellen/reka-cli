@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/nicksellen/reka/config/confutil"
+	"github.com/nicksellen/reka-cli/config/confutil"
 	"log"
 	"path"
 )
